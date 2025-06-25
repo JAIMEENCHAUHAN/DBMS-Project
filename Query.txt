@@ -1,0 +1,100 @@
+-- 1. List all movies with their genres
+SELECT m.title, g.genre_name
+FROM movie m
+JOIN movie_genre mg ON m.movie_id = mg.movie_id
+JOIN genre g ON mg.genre_id = g.genre_id;
+
+-- 2. Get cast members of a specific movie
+SELECT m.title, c.full_name, mc.role
+FROM movie m
+JOIN movie_cast mc ON m.movie_id = mc.movie_id
+JOIN cast c ON mc.cast_id = c.cast_id
+WHERE m.title = 'Inception';
+
+-- 3. Find top-rated movies (rating >= 8)
+SELECT m.title, AVG(r.rating) AS avg_rating
+FROM movie m
+JOIN review r ON m.movie_id = r.movie_id
+GROUP BY m.title
+HAVING AVG(r.rating) >= 8
+ORDER BY avg_rating DESC;
+
+-- 4. Display user watchlist
+SELECT u.full_name, m.title
+FROM watchlist w
+JOIN user u ON w.user_id = u.user_id
+JOIN movie m ON w.movie_id = m.movie_id
+ORDER BY u.full_name;
+
+-- 5. List all reviews with user details
+SELECT u.username, m.title, r.rating, r.written_review
+FROM review r
+JOIN user u ON r.user_id = u.user_id
+JOIN movie m ON r.movie_id = m.movie_id;
+
+-- 6. Show all reviews of a specific movie
+SELECT r.rating, r.written_review, u.username
+FROM review r
+JOIN user u ON r.user_id = u.user_id
+WHERE r.movie_id = (
+    SELECT movie_id FROM movie WHERE title = 'The Matrix'
+);
+
+-- 7. Count upvotes/downvotes on reviews for each movie
+SELECT m.title, SUM(r.upvotes) AS total_upvotes, SUM(r.downvotes) AS total_downvotes
+FROM review r
+JOIN movie m ON r.movie_id = m.movie_id
+GROUP BY m.title;
+
+-- 8. Find all admins managing a given movie
+SELECT a.full_name, m.title
+FROM admin_manage_movie amm
+JOIN admin a ON amm.admin_id = a.admin_id
+JOIN movie m ON amm.movie_id = m.movie_id;
+
+-- 9. Find movies managed by more than one admin
+SELECT m.title, COUNT(DISTINCT amm.admin_id) AS admin_count
+FROM admin_manage_movie amm
+JOIN movie m ON amm.movie_id = m.movie_id
+GROUP BY m.title
+HAVING COUNT(DISTINCT amm.admin_id) > 1;
+
+-- 10. List users who wrote the most reviews
+SELECT u.username, COUNT(r.review_id) AS total_reviews
+FROM user u
+JOIN review r ON u.user_id = r.user_id
+GROUP BY u.username
+ORDER BY total_reviews DESC;
+
+-- 11. Retrieve movies with no reviews
+SELECT m.title
+FROM movie m
+LEFT JOIN review r ON m.movie_id = r.movie_id
+WHERE r.review_id IS NULL;
+
+-- 12. Display movies released after 2020
+SELECT title, release_date
+FROM movie
+WHERE release_date > '2020-01-01';
+
+-- 13. List genres with the number of movies in each
+SELECT g.genre_name, COUNT(mg.movie_id) AS movie_count
+FROM genre g
+JOIN movie_genre mg ON g.genre_id = mg.genre_id
+GROUP BY g.genre_name;
+
+-- 14. Retrieve average IMDB rating by genre
+SELECT g.genre_name, AVG(m.imdb_rating) AS avg_rating
+FROM movie m
+JOIN movie_genre mg ON m.movie_id = mg.movie_id
+JOIN genre g ON mg.genre_id = g.genre_id
+GROUP BY g.genre_name;
+
+-- 15. Display users who have rated all movies
+SELECT u.user_id, u.username
+FROM user u
+WHERE NOT EXISTS (
+    SELECT movie_id FROM movie
+    EXCEPT
+    SELECT movie_id FROM review WHERE user_id = u.user_id
+);

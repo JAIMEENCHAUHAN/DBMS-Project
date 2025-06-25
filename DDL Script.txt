@@ -1,0 +1,78 @@
+DDL Script:
+CREATE SCHEMA 
+
+CREATE TABLE "MovieMania".Movie (
+Movie_ID INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+Title VARCHAR(255) NOT NULL,
+Release_Date DATE NOT NULL,
+Duration INT NOT NULL, 
+IMDB_Rating DECIMAL(3,1) CHECK (IMDB_Rating BETWEEN 0 AND 10),
+Box_Office_Collection BIGINT
+);
+
+CREATE TABLE "MovieMania".Genre (
+Genre_ID INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY ,
+Genre_Name VARCHAR(100) UNIQUE NOT NULL
+);
+
+CREATE TABLE "MovieMania".Cast (
+Cast_ID INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+Full_Name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE "MovieMania".Review (
+Review_ID INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+Movie_ID INT NOT NULL,
+User_ID INT NOT NULL,
+Written_Review TEXT,
+Rating DECIMAL(2,1) CHECK (Rating BETWEEN 0 AND 10),
+Upvotes INT DEFAULT 0,
+Downvotes INT DEFAULT 0,
+FOREIGN KEY (movie_id) REFERENCES "MovieMania".movie(movie_id) ON DELETE CASCADE,
+FOREIGN KEY (User_ID) REFERENCES "MovieMania"."User"(User_ID) ON DELETE CASCADE
+);
+
+CREATE TABLE "MovieMania".Movie_Genre (
+Movie_ID INT NOT NULL,
+Genre_ID INT NOT NULL,
+PRIMARY KEY (movie_id, genre_id),
+FOREIGN KEY (movie_id) REFERENCES "MovieMania".movie(movie_id) ON DELETE CASCADE,
+FOREIGN KEY (genre_id) REFERENCES "MovieMania".genre(genre_id) ON DELETE CASCADE
+);
+
+CREATE TABLE "MovieMania".Movie_Cast (
+Movie_ID INT NOT NULL,
+Cast_ID INT NOT NULL,
+Role VARCHAR(255) NOT NULL,
+PRIMARY KEY (movie_id, cast_id),
+FOREIGN KEY (movie_id) REFERENCES "MovieMania".Movie(movie_id) ON DELETE CASCADE,
+FOREIGN KEY (cast_id) REFERENCES "MovieMania".cast(cast_id) ON DELETE CASCADE
+);
+
+CREATE TABLE "MovieMania".Watchlist (
+User_ID INT NOT NULL,
+Movie_ID INT NOT NULL,
+PRIMARY KEY (user_id, movie_id),
+FOREIGN KEY (user_id) REFERENCES "MovieMania"."User"(user_id) ON DELETE CASCADE,
+FOREIGN KEY (movie_id) REFERENCES "MovieMania".movie(movie_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE "MovieMania".Admin_Manage_Movie (
+Admin_ID INT NOT NULL,
+Movie_ID INT NOT NULL,
+PRIMARY KEY (admin_id, movie_id),
+FOREIGN KEY (admin_id) REFERENCES "MovieMania"."Admin"(admin_id) ON DELETE CASCADE,
+FOREIGN KEY (movie_id) REFERENCES "MovieMania".movie(movie_id) ON DELETE CASCADE
+);
+
+CREATE TABLE "MovieMania".Admin_Manage_Review (
+Admin_ID INT NOT NULL,
+Review_ID INT NOT NULL,
+PRIMARY KEY (admin_id, review_id),
+FOREIGN KEY (admin_id) REFERENCES "MovieMania"."Admin"(admin_id) ON DELETE CASCADE,
+FOREIGN KEY (review_id) REFERENCES "MovieMania".review(review_id) ON DELETE CASCADE
+);
+
+
+
