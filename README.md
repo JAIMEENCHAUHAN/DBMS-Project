@@ -1,3 +1,5 @@
+# DBMS-Project
+
 📝 Project Description
 -----------------------
 DBMS Mini Project: A Relational Database Management System  
@@ -17,4 +19,3 @@ This DBMS mini-project aims to provide a hands-on experience in designing and im
   - Aggregate functions
 
 This project serves as an end-to-end demonstration of core DBMS principles. 
-# DBMS-Project
